@@ -26,9 +26,14 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView recyclerLike;
 
+    //musicDataArrayList
     private ArrayList<MusicData> musicDataArrayList = new ArrayList<>();
+
     private MusicAdapter musicAdapter;
     private Player player;
+
+    //DB 객체참조변수
+    private MusicDBHelper musicDBHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +46,7 @@ public class MainActivity extends AppCompatActivity {
         requestPermissionsFunc();
 
         //어뎁터 생성
-        MusicAdapter musicAdapter = new MusicAdapter(getApplicationContext());
-
+        musicAdapter = new MusicAdapter(getApplicationContext());
         //recyclerView 에서 리니어레이아웃메니저를 적용시켜야 된다.
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
 
@@ -52,10 +56,16 @@ public class MainActivity extends AppCompatActivity {
 
         //ArrayList<MusicData>를 가져와서 musicAdapter 적용시키기
         musicDataArrayList = findMusic();
+
         musicAdapter.setMusicList(musicDataArrayList);
         musicAdapter.notifyDataSetChanged();
 
-        eventHandlerFunc();
+        //DB 에 저장
+        musicDBHelper = MusicDBHelper.getInstance(getApplicationContext());
+
+        //recyclerView 에 나오는 노래를 저장
+        musicDBHelper.insertMusicDataToDB(musicDataArrayList);
+
 
         //인터페이스 구현 못한다면 여기까지가 한계
         musicAdapter.setOnItemClickListener(new MusicAdapter.OnItemClickListener() {
@@ -66,16 +76,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         //현재 액티비티있는 프레임 레이아웃에 프레그먼트 지정
         rePlaceFrag();
 
     }
 
-    private void eventHandlerFunc() {
-        //musicAdapter.setOnItemClickListener();
-    }
 
-    //sdCard안의 음악 검색
+
+    //sdCard 안의 음악 검색
     public ArrayList<MusicData> findMusic() {
         ArrayList<MusicData> sdCardList = new ArrayList<>();
 
@@ -85,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 MediaStore.Audio.Media.TITLE,
                 MediaStore.Audio.Media.ALBUM_ID,
                 MediaStore.Audio.Media.DURATION};
+
         //특정 폴더에서 음악 가져오기
         //String selection = mediaStore.Audio.Media.DATA + "like ? ";
         //String selectionArgs = new String[]{%MusicList%}
@@ -109,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         return sdCardList;
     }
 
-
+    //외부파일에 접근하기위한 허용요청
     private void requestPermissionsFunc() {
         ActivityCompat.requestPermissions(this, new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -131,5 +141,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerLike = (RecyclerView) findViewById(R.id.recyclerLike);
     }
 
-
+    public ArrayList<MusicData> getMusicDataArrayList() {
+        return musicDataArrayList;
+    }
 }

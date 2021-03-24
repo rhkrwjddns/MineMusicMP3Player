@@ -31,15 +31,15 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.CustomViewHo
         this.context = context;
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
-        this.onItemClickListener = onItemClickListener;
-    }
-
     public void setMusicList(ArrayList<MusicData> musicList) {
         this.musicList = musicList;
     }
 
-    //리사이클러 뷰에 들어갈 항목 뷰를 inflater 한다. viewHolder 가 객체관리
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    //리사이클러 뷰에 들어갈 항목 뷰를 inflater 한다. viewHolder 항목객체관리
     @NonNull
     @Override
     public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
@@ -62,15 +62,10 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.CustomViewHo
         customViewHolder.duration.setText(simpleDateFormat.format(Integer.parseInt(musicList.get(position).getDuration())));
     }
 
+    //앨범사진 아이디와 앨범사이즈
     private Bitmap getAlbumImg(Context context, long albumArt, int imgMaxSize) {
         BitmapFactory.Options options = new BitmapFactory.Options();
-        /*컨텐트 프로바이더(Content Provider)는 앱 간의 데이터 공유를 위해 사용됨.
-        특정 앱이 다른 앱의 데이터를 직접 접근해서 사용할 수 없기 때문에
-        무조건 컨텐트 프로바이더를 통해 다른 앱의 데이터를 사용해야만 한다.
-        다른 앱의 데이터를 사용하고자 하는 앱에서는 URI를 이용하여 컨텐트 리졸버(Content Resolver)를 통해
-        다른 앱의 컨텐트 프로바이더에게 데이터를 요청하게 되는데
-        요청받은 컨텐트 프로바이더는 URI를 확인하고 내부에서 데이터를 꺼내어 컨텐트 리졸버에게 전달한다.
-        */
+
         ContentResolver contentResolver = context.getContentResolver();
 
         // 앨범아트는 uri를 제공하지 않으므로, 별도로 생성.
@@ -82,7 +77,8 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.CustomViewHo
 
                 //true면 비트맵객체에 메모리를 할당하지 않아서 비트맵을 반환하지 않음.
                 //다만 options fields는 값이 채워지기 때문에 Load 하려는 이미지의 크기를 포함한 정보들을 얻어올 수 있다.
-                //93번 문항부터 98번까지는 체크안해도 되는 문장임. options.inJustDecodeBounds = false; 앞문장까지
+                //체크안해도 되는 문장, options.inJustDecodeBounds = false; 앞문장까지
+
 
                 options.inJustDecodeBounds = false; // false 비트맵을 만들고 해당이미지의 가로, 세로, 중심으로 가져옴
                 Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fd.getFileDescriptor(), null, options);
@@ -121,7 +117,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.CustomViewHo
         TextView title;
         TextView artist;
         TextView duration;
-        TextView click;
 
         public CustomViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -129,7 +124,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.CustomViewHo
             this.title = itemView.findViewById(R.id.d_tvTitle);
             this.artist = itemView.findViewById(R.id.d_tvArtist);
             this.duration = itemView.findViewById(R.id.d_tvDuration);
-            this.click = itemView.findViewById(R.id.d_tvClick);
 
             //추상화메소드구현
             itemView.setOnClickListener(view->{
