@@ -180,4 +180,36 @@ public class MusicDBHelper extends SQLiteOpenHelper {
         }
         return returnValue;
     }
+
+    // DB 선택(select)
+    public ArrayList<MusicData> selectLikeTBL() {
+
+        ArrayList<MusicData> musicDBArrayList = new ArrayList<>();
+
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        // 쿼리문 입력하고 커서 리턴 받음
+        Cursor cursor = sqLiteDatabase.rawQuery("select * from musicTBL where liked = 1;", null);
+
+        while (cursor.moveToNext()) {
+            MusicData musicData = new MusicData(
+                    cursor.getString(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3),
+                    cursor.getString(4),
+                    cursor.getInt(5),
+                    cursor.getInt(6));
+
+            musicDBArrayList.add(musicData);
+        }
+
+        cursor.close();
+        //  sqLiteDatabase.close();
+
+        return musicDBArrayList;
+    }
+
+
 }

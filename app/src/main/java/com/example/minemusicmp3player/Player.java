@@ -108,7 +108,7 @@ public class Player extends Fragment implements View.OnClickListener{
     public void onClick(View view) {
         switch(view.getId()){
             case R.id.ibPlay:
-                if(ibPlay.isActivated() == true){
+                if(mediaPlayer.isPlaying()){
                     mediaPlayer.pause();
                     ibPlay.setImageResource(R.drawable.ic_play);
                 }else{
@@ -122,24 +122,26 @@ public class Player extends Fragment implements View.OnClickListener{
                 mediaPlayer.reset();
                 index = (index == 0) ? mainActivity.getMusicDataArrayList().size()-1 : index-1;
                 setPlayerData(index, true);
+                ibPlay.setImageResource(R.drawable.ic_pause);
                 break;
             case R.id.ibNext:
                 mediaPlayer.stop();
                 mediaPlayer.reset();
                 index = (index == mainActivity.getMusicDataArrayList().size()-1) ? 0 : index+1;
                 setPlayerData(index, true);
+                ibPlay.setImageResource(R.drawable.ic_pause);
             break;
             case R.id.ibLike:
-                if(ibLike.isActivated()){
-                    ibLike.setActivated(false);
-                    musicData.setLiked(0);
-                    Toast.makeText(mainActivity, "취소", Toast.LENGTH_SHORT).show();
-                }else{
-                    ibLike.setActivated(true);
+                if(musicData.getLiked()==0){
                     musicData.setLiked(1);
+                    ibLike.setImageResource(R.drawable.ic_like);
                     Toast.makeText(mainActivity, "좋아요", Toast.LENGTH_SHORT).show();
+                }else{
+                    musicData.setLiked(0);
+                    ibLike.setImageResource(R.drawable.ic_dislike);
+                    Toast.makeText(mainActivity, "취소", Toast.LENGTH_SHORT).show();
                 }
-
+                mainActivity.getMusicDBHelper().updateMusicDataToDB(musicData);
                 break;
             default: break;
         }
@@ -170,16 +172,16 @@ public class Player extends Fragment implements View.OnClickListener{
 
     }
 
-    //recyclerView 에서 아에팀 선택하면 해당 위치와 좋아요(false), 일반음악(true) 선택내용 나옴.
+    //recyclerView 에서 아이템 선택하면 해당 위치와 좋아요(false), 일반음악(true) 선택내용 나옴.
     public void setPlayerData(int position, boolean flag) {
         index= position;
         mediaPlayer.stop();
         mediaPlayer.reset();
 
-        if(flag == true){
-            musicData=mainActivity.getMusicDataArrayList().get(index);
+        if(flag==true){
+            musicData = mainActivity.getMusicDataArrayList().get(index);
         }else{
-
+            musicData = mainActivity.getMusicDataArrayList().get(index);
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
 
@@ -187,11 +189,10 @@ public class Player extends Fragment implements View.OnClickListener{
         tvArtist.setText(musicData.getArtist());
         tvClick.setText(String.valueOf(musicData.getClick()));
         tvDuration.setText(simpleDateFormat.format(Integer.parseInt(musicData.getDuration())));
-
         if(musicData.getLiked() == 1){
-            ibLike.setActivated(true);
+            ibLike.setImageResource(R.drawable.ic_like);
         }else{
-            ibLike.setActivated(false);
+            ibLike.setImageResource(R.drawable.ic_dislike);
         }
 
         //앨범 이미지 세팅
