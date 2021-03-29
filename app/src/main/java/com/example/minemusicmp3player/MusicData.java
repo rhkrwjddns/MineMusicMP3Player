@@ -10,20 +10,18 @@ public class MusicData {
     private String albumArt;
     private String duration;
     private int click;
-    private int liked;
 
     public MusicData(){
 
     }
 
-    public MusicData(String id, String artist, String title, String albumArt, String duration, int click, int liked) {
+    public MusicData(String id, String artist, String title, String albumArt, String duration, int click) {
         this.id = id;
         this.artist = artist;
         this.title = title;
         this.albumArt = albumArt;
         this.duration = duration;
         this.click = click;
-        this.liked = liked;
     }
 
     public String getId() {
@@ -72,14 +70,6 @@ public class MusicData {
 
     public void setClick(int click) {
         this.click = click;
-    }
-
-    public int getLiked() {
-        return liked;
-    }
-
-    public void setLiked(int liked) {
-        this.liked = liked;
     }
 
     @Override

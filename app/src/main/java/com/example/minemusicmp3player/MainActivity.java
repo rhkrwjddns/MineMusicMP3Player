@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -24,13 +25,11 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private FrameLayout frameLayout;
     private RecyclerView recyclerView;
-    private RecyclerView recyclerLike;
 
     //musicDataArrayList
     private ArrayList<MusicData> musicDataArrayList = new ArrayList<>();
-    private ArrayList<MusicData> likeDataArrayList = new ArrayList<>();
 
-    private MusicAdapter musicAdapter, musicAdapterLike;
+    private MusicAdapter musicAdapter;
     private Player player;
 
     //DB 객체참조변수
@@ -48,18 +47,14 @@ public class MainActivity extends AppCompatActivity {
 
         //어뎁터 생성
         musicAdapter = new MusicAdapter(getApplicationContext());
-        musicAdapterLike = new MusicAdapter(getApplicationContext());
 
         //recyclerView 에서 리니어레이아웃메니저를 적용시켜야 된다.
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        LinearLayoutManager likeLayoutManager = new LinearLayoutManager(getApplicationContext());
 
 
         //recyclerView 에 리니어레이아웃메니저를 적용
         recyclerView.setAdapter(musicAdapter);
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerLike.setAdapter(musicAdapter);
-        recyclerLike.setLayoutManager(likeLayoutManager);
 
         //DB생성
         musicDBHelper = MusicDBHelper.getInstance(getApplicationContext());
@@ -67,12 +62,9 @@ public class MainActivity extends AppCompatActivity {
         //ArrayList<MusicData>를 가져와서 musicAdapter 적용시키기
         musicDataArrayList = findMusic();
         musicDBHelper.insertMusicDataToDB(musicDataArrayList);
-        likeDataArrayList = musicDBHelper.selectLikeTBL();
 
         musicAdapter.setMusicList(musicDataArrayList);
         musicAdapter.notifyDataSetChanged();
-        musicAdapterLike.setMusicList(likeDataArrayList);
-        musicAdapterLike.notifyDataSetChanged();
 
 
         //DB 에 저장
@@ -86,16 +78,8 @@ public class MainActivity extends AppCompatActivity {
         musicAdapter.setOnItemClickListener(new MusicAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                player.setPlayerData(position,true);
+                player.setPlayerData(position);
                 drawerLayout.closeDrawer(Gravity.LEFT);
-            }
-        });
-
-        musicAdapterLike.setOnItemClickListener(new MusicAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                player.setPlayerData(position, true);
-                drawerLayout.closeDrawer(Gravity.RIGHT);
             }
         });
 
@@ -135,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 String albumArt = cursor.getString(cursor.getColumnIndex(data[3]));
                 String duration = cursor.getString(cursor.getColumnIndex(data[4]));
 
-                MusicData mData = new MusicData(id, artist, title, albumArt, duration, 0, 0);
+                MusicData mData = new MusicData(id, artist, title, albumArt, duration, 0);
                 sdCardList.add(mData);
             }
         }
@@ -161,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
         frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerLike = (RecyclerView) findViewById(R.id.recyclerLike);
     }
 
     public ArrayList<MusicData> getMusicDataArrayList() {

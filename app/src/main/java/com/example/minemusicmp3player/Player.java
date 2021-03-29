@@ -32,7 +32,7 @@ public class Player extends Fragment implements View.OnClickListener{
     private ImageView ivAlbum;
     private TextView tvClick, tvArtist, tvTitle, tvCurrentTime, tvDuration;
     private SeekBar seekBar;
-    private ImageButton ibPlay, ibPrevious, ibNext, ibLike;
+    private ImageButton ibPlay, ibPrevious, ibNext;
 
     //프래그먼트에서 장착된 액티비티 가져오기 가ㅑ능 (getActivity())
     //노래를 등록하기 위한 선언 객체변수
@@ -42,8 +42,6 @@ public class Player extends Fragment implements View.OnClickListener{
     //노래 위치지정
     private int index;
     private MusicData musicData = new MusicData();
-
-    private ArrayList<MusicData> likeArrayList = new ArrayList<>();
 
     //Context (화면+클래스)
     @Override
@@ -78,12 +76,10 @@ public class Player extends Fragment implements View.OnClickListener{
         ibPlay = view.findViewById(R.id.ibPlay);
         ibPrevious = view.findViewById(R.id.ibPrevious);
         ibNext = view.findViewById(R.id.ibNext);
-        ibLike = view.findViewById(R.id.ibLike);
 
         ibPlay.setOnClickListener(this);
         ibPrevious.setOnClickListener(this);
         ibNext.setOnClickListener(this);
-        ibLike.setOnClickListener(this);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -121,28 +117,16 @@ public class Player extends Fragment implements View.OnClickListener{
                 mediaPlayer.stop();
                 mediaPlayer.reset();
                 index = (index == 0) ? mainActivity.getMusicDataArrayList().size()-1 : index-1;
-                setPlayerData(index, true);
+                setPlayerData(index);
                 ibPlay.setImageResource(R.drawable.ic_pause);
                 break;
             case R.id.ibNext:
                 mediaPlayer.stop();
                 mediaPlayer.reset();
                 index = (index == mainActivity.getMusicDataArrayList().size()-1) ? 0 : index+1;
-                setPlayerData(index, true);
+                setPlayerData(index);
                 ibPlay.setImageResource(R.drawable.ic_pause);
             break;
-            case R.id.ibLike:
-                if(musicData.getLiked()==0){
-                    musicData.setLiked(1);
-                    ibLike.setImageResource(R.drawable.ic_like);
-                    Toast.makeText(mainActivity, "좋아요", Toast.LENGTH_SHORT).show();
-                }else{
-                    musicData.setLiked(0);
-                    ibLike.setImageResource(R.drawable.ic_dislike);
-                    Toast.makeText(mainActivity, "취소", Toast.LENGTH_SHORT).show();
-                }
-                mainActivity.getMusicDBHelper().updateMusicDataToDB(musicData);
-                break;
             default: break;
         }
     }
@@ -172,28 +156,20 @@ public class Player extends Fragment implements View.OnClickListener{
 
     }
 
-    //recyclerView 에서 아이템 선택하면 해당 위치와 좋아요(false), 일반음악(true) 선택내용 나옴.
-    public void setPlayerData(int position, boolean flag) {
+    //recyclerView 에서 아이템 선택하면 해당 위치의 선택내용 나옴.
+    public void setPlayerData(int position) {
         index= position;
         mediaPlayer.stop();
         mediaPlayer.reset();
 
-        if(flag==true){
-            musicData = mainActivity.getMusicDataArrayList().get(index);
-        }else{
-            musicData = mainActivity.getMusicDataArrayList().get(index);
-        }
+        musicData = mainActivity.getMusicDataArrayList().get(index);
+
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
 
         tvTitle.setText(musicData.getTitle());
         tvArtist.setText(musicData.getArtist());
         tvClick.setText(String.valueOf(musicData.getClick()));
         tvDuration.setText(simpleDateFormat.format(Integer.parseInt(musicData.getDuration())));
-        if(musicData.getLiked() == 1){
-            ibLike.setImageResource(R.drawable.ic_like);
-        }else{
-            ibLike.setImageResource(R.drawable.ic_dislike);
-        }
 
         //앨범 이미지 세팅
         Bitmap albumImg =getAlbumImg(mainActivity, Long.parseLong(musicData.getAlbumArt()), 200);
@@ -211,7 +187,7 @@ public class Player extends Fragment implements View.OnClickListener{
             mediaPlayer.start();
             seekBar.setProgress(0);
             seekBar.setMax(Integer.parseInt(musicData.getDuration()));
-            ibPlay.setActivated(true);
+            ibPlay.setImageResource(R.drawable.ic_pause);
 
             setSeekBarThread();
 
@@ -266,6 +242,7 @@ public class Player extends Fragment implements View.OnClickListener{
                     if (fd != null)
                         fd.close();
                 } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

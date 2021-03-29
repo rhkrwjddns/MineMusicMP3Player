@@ -77,24 +77,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#fafafa"
-            android:gravity="bottom|right"
-            android:paddingRight="15dp"
-            android:paddingBottom="10dp">
-
-            <ImageButton
-                android:id="@+id/ibLike"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#fafafa"
-                android:src="@drawable/ic_dislike" />
-
-
-        </LinearLayout>
-
     </LinearLayout>
 
     <LinearLayout
